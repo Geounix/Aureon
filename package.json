@@ -1,0 +1,52 @@
+{
+  "name": "aureon",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "seed": "npx ts-node --esm prisma/seed.ts",
+    "db:seed": "npx prisma db seed"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.7.0",
+    "@prisma/client": "^7.7.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/hls.js": "^0.13.3",
+    "@types/howler": "^2.2.12",
+    "@types/jszip": "^3.4.0",
+    "@types/pg": "^8.20.0",
+    "bcryptjs": "^3.0.3",
+    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
+    "framer-motion": "^12.38.0",
+    "hls.js": "^1.6.15",
+    "howler": "^2.2.4",
+    "jszip": "^3.10.1",
+    "lucide-react": "^1.8.0",
+    "next": "16.2.3",
+    "next-auth": "^5.0.0-beta.25",
+    "pg": "^8.20.0",
+    "prisma": "^7.7.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "tailwind-merge": "^3.5.0",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^17.4.1",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.3",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  },
+  "prisma": {
+    "seed": "npx ts-node --compiler-options {\"module\":\"CommonJS\"} prisma/seed.ts"
+  }
+}

@@ -1,0 +1,354 @@
+@import "tailwindcss";
+
+/* ══════════════════════════════════════
+   AUREON — DESIGN SYSTEM
+   ══════════════════════════════════════ */
+
+@layer base {
+  :root {
+    /* Backgrounds */
+    --bg-primary: #09090f;
+    --bg-secondary: #111118;
+    --bg-card: #18181f;
+    --bg-elevated: #1e1e28;
+    --bg-hover: #252532;
+
+    /* Accents */
+    --accent-primary: #7c6bff;
+    --accent-primary-hover: #9585ff;
+    --accent-glow: rgba(124, 107, 255, 0.25);
+    --accent-blue: #3b82f6;
+    --accent-gold: #f59e0b;
+    --accent-rose: #f43f5e;
+    --accent-emerald: #10b981;
+
+    /* Text */
+    --text-primary: #f0f0ff;
+    --text-secondary: #8888a8;
+    --text-muted: #4a4a6a;
+
+    /* Borders */
+    --border: rgba(255, 255, 255, 0.07);
+    --border-hover: rgba(255, 255, 255, 0.15);
+    --border-accent: rgba(124, 107, 255, 0.4);
+
+    /* Shadows */
+    --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.4);
+    --shadow-glow: 0 0 40px rgba(124, 107, 255, 0.2);
+    --shadow-lg: 0 20px 60px rgba(0, 0, 0, 0.6);
+
+    /* Timing */
+    --transition-fast: 150ms ease-out;
+    --transition-base: 250ms ease-out;
+    --transition-slow: 400ms ease-out;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    font-family: var(--font-inter), system-ui, sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--text-muted);
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+  }
+
+  ::selection {
+    background: var(--accent-primary);
+    color: white;
+  }
+}
+
+@layer components {
+  /* ─── CARDS ─── */
+  .media-card {
+    @apply relative overflow-hidden rounded-xl cursor-pointer;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  }
+
+  .media-card:hover {
+    transform: scale(1.03) translateY(-2px);
+    box-shadow: var(--shadow-card), var(--shadow-glow);
+    border-color: var(--border-hover);
+  }
+
+  /* ─── BUTTONS ─── */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-medium text-sm;
+    @apply px-5 py-2.5;
+    background: var(--accent-primary);
+    color: white;
+    transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .btn-primary:hover {
+    background: var(--accent-primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 20px var(--accent-glow);
+  }
+
+  .btn-primary:active {
+    transform: translateY(0);
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-lg font-medium text-sm;
+    @apply px-5 py-2.5;
+    background: transparent;
+    border: 1px solid var(--border-hover);
+    color: var(--text-primary);
+    transition: background var(--transition-fast), border-color var(--transition-fast);
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-accent);
+  }
+
+  .btn-icon {
+    @apply flex items-center justify-center rounded-lg w-9 h-9;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+  }
+
+  .btn-icon:hover {
+    background: var(--bg-elevated);
+    border-color: var(--border-hover);
+    color: var(--text-primary);
+  }
+
+  /* ─── INPUTS ─── */
+  .input-base {
+    @apply w-full rounded-lg px-4 py-2.5 text-sm outline-none;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+  }
+
+  .input-base::placeholder {
+    color: var(--text-muted);
+  }
+
+  .input-base:focus {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar-link {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+  }
+
+  .sidebar-link:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .sidebar-link.active {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-left: 2px solid var(--accent-primary);
+  }
+
+  /* ─── BADGES ─── */
+  .badge {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+
+  .badge-new {
+    background: rgba(16, 185, 129, 0.15);
+    color: var(--accent-emerald);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .badge-progress {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--accent-blue);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .badge-completed {
+    background: rgba(124, 107, 255, 0.15);
+    color: var(--accent-primary);
+    border: 1px solid rgba(124, 107, 255, 0.3);
+  }
+
+  /* ─── SKELETON ─── */
+  .skeleton {
+    background: linear-gradient(
+      90deg,
+      var(--bg-card) 25%,
+      var(--bg-elevated) 50%,
+      var(--bg-card) 75%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 8px;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  .progress-bar {
+    @apply relative w-full h-1 rounded-full overflow-hidden;
+    background: var(--bg-elevated);
+  }
+
+  .progress-bar-fill {
+    @apply absolute top-0 left-0 h-full rounded-full;
+    background: var(--accent-primary);
+    transition: width 0.3s ease;
+  }
+
+  /* ─── GLASS EFFECT ─── */
+  .glass {
+    background: rgba(9, 9, 15, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border);
+  }
+
+  /* ─── CAROUSELS ─── */
+  .carousel-scroll {
+    @apply flex gap-4 overflow-x-auto pb-2;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .carousel-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ─── GRADIENT OVERLAYS ─── */
+  .gradient-bottom {
+    background: linear-gradient(to top, var(--bg-primary) 0%, transparent 60%);
+  }
+
+  .gradient-left {
+    background: linear-gradient(to right, var(--bg-primary) 0%, transparent 50%);
+  }
+
+  /* ─── SECTION TITLE ─── */
+  .section-title {
+    @apply text-lg font-semibold mb-4;
+    font-family: var(--font-outfit), var(--font-inter), sans-serif;
+    color: var(--text-primary);
+  }
+
+  /* ─── PLAYER ─── */
+  .mini-player {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(14, 14, 22, 0.92);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    padding: 12px 24px;
+  }
+
+  /* ─── HERO ─── */
+  .hero-section {
+    @apply relative w-full overflow-hidden;
+    min-height: 600px;
+  }
+
+  .hero-content {
+    @apply absolute inset-0 flex flex-col justify-end;
+    padding: 3rem;
+    background: linear-gradient(
+      to right,
+      var(--bg-primary) 30%,
+      transparent 70%
+    ),
+    linear-gradient(
+      to top,
+      var(--bg-primary) 0%,
+      transparent 50%
+    );
+  }
+
+  /* ─── PAGE LAYOUT ─── */
+  .page-with-sidebar {
+    @apply flex min-h-screen;
+  }
+
+  .main-content {
+    @apply flex-1 overflow-y-auto;
+    margin-left: 240px;
+    padding-bottom: 100px;
+  }
+
+  @media (max-width: 768px) {
+    .main-content {
+      margin-left: 0;
+    }
+  }
+
+  /* ─── STAT CARD ─── */
+  .stat-card {
+    @apply rounded-xl p-5;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    transition: border-color var(--transition-fast);
+  }
+
+  .stat-card:hover {
+    border-color: var(--border-hover);
+  }
+}
+
+@layer utilities {
+  .font-display {
+    font-family: var(--font-outfit), var(--font-inter), sans-serif;
+  }
+
+  .text-gradient {
+    background: linear-gradient(135deg, var(--accent-primary), var(--accent-blue));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-primary {
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+}

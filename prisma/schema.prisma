@@ -1,0 +1,461 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ════════════════════════════════════════
+// AUTH & USUARIOS
+// ════════════════════════════════════════
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profiles  Profile[]
+  sessions  DeviceSession[]
+}
+
+model Profile {
+  id        String  @id @default(cuid())
+  userId    String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  avatarUrl String?
+  isKids    Boolean @default(false)
+  language  String  @default("es")
+  createdAt DateTime @default(now())
+
+  watchlist         Watchlist[]
+  playbackProgress  PlaybackProgress[]
+  listeningProgress ListeningProgress[]
+  readingProgress   ReadingProgress[]
+  playlists         Playlist[]
+  recommendations   Recommendation[]
+}
+
+enum Role {
+  ADMIN
+  USER
+  VIEWER
+}
+
+// ════════════════════════════════════════
+// BIBLIOTECAS
+// ════════════════════════════════════════
+
+model Library {
+  id          String      @id @default(cuid())
+  name        String
+  type        LibraryType
+  path        String
+  scanEnabled Boolean     @default(true)
+  lastScanned DateTime?
+  createdAt   DateTime    @default(now())
+
+  mediaItems  MediaItem[]
+  albums      Album[]
+  comicSeries ComicSeries[]
+}
+
+enum LibraryType {
+  MOVIE
+  SERIES
+  MUSIC
+  COMICS
+}
+
+// ════════════════════════════════════════
+// VIDEO — PELÍCULAS Y SERIES
+// ════════════════════════════════════════
+
+model MediaItem {
+  id            String    @id @default(cuid())
+  libraryId     String
+  library       Library   @relation(fields: [libraryId], references: [id])
+  type          MediaType
+  title         String
+  originalTitle String?
+  synopsis      String?
+  posterUrl     String?
+  backdropUrl   String?
+  trailerUrl    String?
+  year          Int?
+  duration      Int?      // segundos
+  rating        String?   // PG, PG-13, R, etc.
+  country       String?
+  language      String?
+  quality       String?   // 1080p, 4K, HDR
+  filePath      String?
+  fileSize      BigInt?
+  bitrate       Int?
+  imdbId        String?
+  tmdbId        String?
+  addedAt       DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  genres           GenreOnMedia[]
+  tags             TagOnMedia[]
+  cast             CastMember[]
+  directors        Director[]
+  studios          Studio[]
+  subtitles        SubtitleTrack[]
+  audioTracks      AudioTrack[]
+  seasons          Season[]
+  playbackProgress PlaybackProgress[]
+  watchlist        Watchlist[]
+  collectionItems  CollectionItem[]
+  recommendations  Recommendation[]
+}
+
+enum MediaType {
+  MOVIE
+  SERIES
+  DOCUMENTARY
+  ANIME
+  CONCERT
+  VIDEO
+}
+
+model Season {
+  id          String    @id @default(cuid())
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  number      Int
+  title       String?
+  posterUrl   String?
+  year        Int?
+
+  episodes    Episode[]
+}
+
+model Episode {
+  id           String    @id @default(cuid())
+  seasonId     String
+  season       Season    @relation(fields: [seasonId], references: [id], onDelete: Cascade)
+  number       Int
+  title        String
+  synopsis     String?
+  duration     Int?
+  thumbnailUrl String?
+  filePath     String?
+  airDate      DateTime?
+
+  playbackProgress PlaybackProgress[]
+}
+
+model SubtitleTrack {
+  id          String    @id @default(cuid())
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  language    String
+  label       String?
+  filePath    String
+}
+
+model AudioTrack {
+  id          String    @id @default(cuid())
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  language    String
+  codec       String?
+  channels    Int?
+  label       String?
+}
+
+// ════════════════════════════════════════
+// MÚSICA
+// ════════════════════════════════════════
+
+model Artist {
+  id       String  @id @default(cuid())
+  name     String
+  bio      String?
+  imageUrl String?
+  country  String?
+
+  genres   GenreOnArtist[]
+  albums   Album[]
+}
+
+model Album {
+  id        String   @id @default(cuid())
+  artistId  String
+  artist    Artist   @relation(fields: [artistId], references: [id])
+  libraryId String?
+  library   Library? @relation(fields: [libraryId], references: [id])
+  title     String
+  year      Int?
+  coverUrl  String?
+  genre     String?
+  addedAt   DateTime @default(now())
+
+  tracks    MusicTrack[]
+}
+
+model MusicTrack {
+  id          String   @id @default(cuid())
+  albumId     String
+  album       Album    @relation(fields: [albumId], references: [id], onDelete: Cascade)
+  title       String
+  trackNumber Int?
+  duration    Int?
+  filePath    String
+  bitrate     Int?
+  lyrics      String?
+  mood        String?
+  composer    String?
+  addedAt     DateTime @default(now())
+
+  listeningProgress ListeningProgress[]
+  playlistTracks    PlaylistTrack[]
+}
+
+model Playlist {
+  id          String   @id @default(cuid())
+  profileId   String
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  coverUrl    String?
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  tracks      PlaylistTrack[]
+}
+
+model PlaylistTrack {
+  id         String     @id @default(cuid())
+  playlistId String
+  playlist   Playlist   @relation(fields: [playlistId], references: [id], onDelete: Cascade)
+  trackId    String
+  track      MusicTrack @relation(fields: [trackId], references: [id])
+  order      Int
+}
+
+// ════════════════════════════════════════
+// CÓMICS / MANGA
+// ════════════════════════════════════════
+
+model ComicSeries {
+  id        String   @id @default(cuid())
+  libraryId String?
+  library   Library? @relation(fields: [libraryId], references: [id])
+  title     String
+  author    String?
+  publisher String?
+  coverUrl  String?
+  synopsis  String?
+  genre     String?
+  language  String?
+  tags      String[]
+  addedAt   DateTime @default(now())
+
+  volumes         ComicVolume[]
+  readingProgress ReadingProgress[]
+}
+
+model ComicVolume {
+  id       String      @id @default(cuid())
+  seriesId String
+  series   ComicSeries @relation(fields: [seriesId], references: [id], onDelete: Cascade)
+  number   Int
+  title    String?
+  coverUrl String?
+
+  chapters ComicChapter[]
+}
+
+model ComicChapter {
+  id        String      @id @default(cuid())
+  volumeId  String
+  volume    ComicVolume @relation(fields: [volumeId], references: [id], onDelete: Cascade)
+  number    Float
+  title     String?
+  filePath  String      // ruta al CBZ/CBR/PDF
+  pageCount Int?
+
+  readingProgress ReadingProgress[]
+}
+
+// ════════════════════════════════════════
+// METADATOS COMPARTIDOS
+// ════════════════════════════════════════
+
+model Genre {
+  id      String          @id @default(cuid())
+  name    String          @unique
+  media   GenreOnMedia[]
+  artists GenreOnArtist[]
+}
+
+model GenreOnMedia {
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  genreId     String
+  genre       Genre     @relation(fields: [genreId], references: [id])
+
+  @@id([mediaItemId, genreId])
+}
+
+model GenreOnArtist {
+  artistId String
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+  genreId  String
+  genre    Genre  @relation(fields: [genreId], references: [id])
+
+  @@id([artistId, genreId])
+}
+
+model Tag {
+  id    String       @id @default(cuid())
+  name  String       @unique
+  media TagOnMedia[]
+}
+
+model TagOnMedia {
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  tagId       String
+  tag         Tag       @relation(fields: [tagId], references: [id])
+
+  @@id([mediaItemId, tagId])
+}
+
+model CastMember {
+  id          String    @id @default(cuid())
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  name        String
+  character   String?
+  photoUrl    String?
+  order       Int       @default(0)
+}
+
+model Director {
+  id          String    @id @default(cuid())
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  name        String
+  photoUrl    String?
+}
+
+model Studio {
+  id          String    @id @default(cuid())
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id], onDelete: Cascade)
+  name        String
+}
+
+// ════════════════════════════════════════
+// PROGRESO Y WATCHLIST
+// ════════════════════════════════════════
+
+model PlaybackProgress {
+  id          String     @id @default(cuid())
+  profileId   String
+  profile     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  mediaItemId String?
+  mediaItem   MediaItem? @relation(fields: [mediaItemId], references: [id])
+  episodeId   String?
+  episode     Episode?   @relation(fields: [episodeId], references: [id])
+  position    Int        // segundos
+  duration    Int        // segundos totales
+  completed   Boolean    @default(false)
+  updatedAt   DateTime   @updatedAt
+}
+
+model ListeningProgress {
+  id          String     @id @default(cuid())
+  profileId   String
+  profile     Profile    @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  trackId     String
+  track       MusicTrack @relation(fields: [trackId], references: [id])
+  playCount   Int        @default(0)
+  lastPlayed  DateTime?
+  updatedAt   DateTime   @updatedAt
+}
+
+model ReadingProgress {
+  id          String       @id @default(cuid())
+  profileId   String
+  profile     Profile      @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  seriesId    String?
+  series      ComicSeries? @relation(fields: [seriesId], references: [id])
+  chapterId   String?
+  chapter     ComicChapter? @relation(fields: [chapterId], references: [id])
+  currentPage Int          @default(0)
+  totalPages  Int?
+  completed   Boolean      @default(false)
+  updatedAt   DateTime     @updatedAt
+}
+
+model Watchlist {
+  id          String    @id @default(cuid())
+  profileId   String
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id])
+  addedAt     DateTime  @default(now())
+
+  @@unique([profileId, mediaItemId])
+}
+
+// ════════════════════════════════════════
+// COLECCIONES Y RECOMENDACIONES
+// ════════════════════════════════════════
+
+model Collection {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  coverUrl    String?
+  isAutomatic Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  items       CollectionItem[]
+}
+
+model CollectionItem {
+  id           String     @id @default(cuid())
+  collectionId String
+  collection   Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
+  mediaItemId  String
+  mediaItem    MediaItem  @relation(fields: [mediaItemId], references: [id])
+  order        Int
+
+  @@unique([collectionId, mediaItemId])
+}
+
+model Recommendation {
+  id          String    @id @default(cuid())
+  profileId   String
+  profile     Profile   @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  mediaItemId String
+  mediaItem   MediaItem @relation(fields: [mediaItemId], references: [id])
+  score       Float
+  reason      String?
+  createdAt   DateTime  @default(now())
+}
+
+// ════════════════════════════════════════
+// SESIONES DE DISPOSITIVO
+// ════════════════════════════════════════
+
+model DeviceSession {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  deviceName String?
+  deviceType String?
+  ip         String?
+  lastSeen   DateTime @updatedAt
+  createdAt  DateTime @default(now())
+}
